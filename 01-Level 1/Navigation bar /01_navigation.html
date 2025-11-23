@@ -1,0 +1,254 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Animated Navigation Bar</title>
+  <style>
+    /* ========== Variables ========== */
+    :root{
+      --bg: #0f1724;            /* page background */
+      --nav-bg: rgba(255,255,255,0.04);
+      --accent: #ffcc33;        /* accent (yellow) */
+      --muted: rgba(255,255,255,0.65);
+      --glass: rgba(255,255,255,0.06);
+      --radius: 12px;
+      --height: 72px;
+      --gap: 28px;
+    }
+
+    /* ========== Basic page ========== */
+    *{box-sizing: border-box}
+    html,body{height:100%;}
+    body{
+      margin:0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      background: linear-gradient(180deg,var(--bg) 0%, #08101a 100%);
+      color: #fff;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:48px;
+    }
+
+    /* ========== Navbar container ========== */
+    .navbar-wrap{
+      width:100%;
+      max-width:1100px;
+    }
+
+    .nav-links a:hover::after{
+      background: var(--accent);
+      transform: translateY(0);
+      height: 4px;
+      opacity: 1;
+    }
+
+
+    nav.navbar{
+      height:var(--height);
+      padding:10px 18px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border-radius:20px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:var(--gap);
+      position:relative;
+      box-shadow: 0 6px 20px rgba(2,6,23,0.7), inset 0 1px 0 rgba(255,255,255,0.02);
+    }
+
+    .brand{
+      display:flex;
+      gap:12px;
+      align-items:center;
+      user-select:none;
+    }
+
+    .logo{
+      width:48px;height:48px;border-radius:12px;
+      display:grid;place-items:center;
+      background:linear-gradient(135deg, var(--accent), #f7b500);
+      color:#061126;font-weight:700;
+      font-size:18px;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.5);
+    }
+
+    .brand h1{font-size:16px;margin:0;letter-spacing:0.2px}
+    .brand p{margin:0;font-size:12px;color:var(--muted)}
+
+    /* ========== Nav links ========== */
+    .nav-links{
+      display:flex;
+      gap:28px;
+      align-items:center;
+      position:relative;
+    }
+
+    .nav-links a{
+      position:relative;
+      text-decoration:none;
+      color:var(--muted);
+      font-weight:600;
+      padding:8px 6px;
+      transition: color 220ms cubic-bezier(.2,.9,.3,1), transform 220ms;
+      border-radius:6px;
+      font-size:15px;
+    }
+
+    .nav-links a:hover{color: #fff; transform: translateY(-2px)}
+
+    /* Animated underline — uses a moving highlight element */
+    .nav-highlight{
+      position:absolute;
+      height:38px;
+      background: linear-gradient(90deg, rgba(255,204,51,0.12), rgba(255,204,51,0.06));
+      border-radius:10px;
+      top:50%; transform:translateY(-50%);
+      left:0; width:0;
+      pointer-events:none;
+      transition: all 280ms cubic-bezier(.2,.9,.3,1);
+      box-shadow: 0 6px 18px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.02);
+      backdrop-filter: blur(6px);
+    }
+
+    /* active indicator — a small accent bar under the active item */
+    .nav-links a::after{
+      content:''; display:block; height:3px; width:100%; border-radius:3px; background:transparent; position:absolute; left:0; bottom:-11px; transform:translateY(6px); transition: transform 300ms, background 300ms;
+    }
+
+    .nav-links a.active{ color: #fff }
+    .nav-links a.active::after{ background:var(--accent); transform:translateY(0) }
+
+    /* ========== CTA button ========== */
+    .cta{
+      padding:10px 14px; border-radius:12px; background:transparent; border:1px solid rgba(255,255,255,0.08);
+      font-weight:700; cursor:pointer; transition: all 220ms;
+    }
+    .cta:hover{ transform:translateY(-3px); box-shadow: 0 8px 30px rgba(255,204,51,0.08); border-color: rgba(255,204,51,0.18); }
+
+    /* ========== Mobile menu ========== */
+    .hamburger{ display:none; cursor:pointer; width:46px; height:46px; border-radius:10px; align-items:center; justify-content:center; }
+    .hamburger span{ width:22px; height:2px; background:var(--muted); display:block; border-radius:2px; position:relative; transition: all 220ms; }
+    .hamburger span::before, .hamburger span::after{ content:''; position:absolute; left:0; width:22px; height:2px; background:var(--muted); border-radius:2px; transition: all 220ms }
+    .hamburger span::before{ top:-7px }
+    .hamburger span::after{ top:7px }
+
+    /* Mobile active state */
+    .hamburger.open span{ background:transparent }
+    .hamburger.open span::before{ transform: translateY(7px) rotate(45deg) }
+    .hamburger.open span::after{ transform: translateY(-7px) rotate(-45deg) }
+
+    /* Responsive behaviour */
+    @media (max-width:880px){
+      .nav-links{ display:none }
+      .hamburger{ display:flex }
+      nav.navbar{ padding:12px }
+    }
+
+    /* Demo area below nav */
+    .demo{
+      margin-top:22px; padding:22px; border-radius:12px; background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      color:var(--muted); font-size:14px;
+    }
+  </style>
+</head>
+<body>
+  <div class="navbar-wrap">
+    <nav class="navbar" aria-label="Primary">
+      <div class="brand">
+        <div class="logo">FM</div>
+        <div>
+          <h1>From Me to You</h1>
+          <p>Premium templates</p>
+        </div>
+      </div>
+
+      <div class="nav-links" role="navigation" aria-label="Main navigation">
+        <div class="nav-highlight" id="navHighlight" aria-hidden="true"></div>
+        <a href="#" data-index="0" class="active">Home</a>
+        <a href="#" data-index="1">Listings</a>
+        <a href="#" data-index="2">Projects</a>
+        <a href="#" data-index="3">About</a>
+        <a href="#" data-index="4">Contact</a>
+      </div>
+
+      <div style="display:flex;gap:12px;align-items:center">
+        <button class="cta">Get Started</button>
+        <button class="hamburger" id="hamburger" aria-label="Toggle menu">
+          <span></span>
+        </button>
+      </div>
+    </nav>
+
+    <div class="demo">
+      This is a simple demo page. Resize the window to see the responsive hamburger. Hover over the menu to move the highlight. Click different items to set the active state.
+    </div>
+  </div>
+
+  <script>
+    // Animated highlight that follows the hovered or active nav link
+    (function(){
+      const nav = document.querySelector('.nav-links');
+      const links = Array.from(nav.querySelectorAll('a'));
+      const highlight = document.getElementById('navHighlight');
+
+      function moveHighlightTo(el){
+        if(!el) return;
+        const rect = el.getBoundingClientRect();
+        const navRect = nav.getBoundingClientRect();
+        const left = rect.left - navRect.left - 6; // small padding
+        const width = rect.width + 12;
+        highlight.style.left = left + 'px';
+        highlight.style.width = width + 'px';
+      }
+
+      // initialize to active
+      const active = nav.querySelector('a.active') || links[0];
+      moveHighlightTo(active);
+
+      links.forEach(link =>{
+        link.addEventListener('mouseenter', (e)=> moveHighlightTo(e.currentTarget));
+        link.addEventListener('focus', (e)=> moveHighlightTo(e.currentTarget));
+        link.addEventListener('click', (e)=>{
+          links.forEach(l=> l.classList.remove('active'));
+          e.currentTarget.classList.add('active');
+          moveHighlightTo(e.currentTarget);
+        });
+      });
+
+      nav.addEventListener('mouseleave', ()=>{
+        // return to the active
+        const current = nav.querySelector('a.active') || links[0];
+        moveHighlightTo(current);
+      });
+
+      // mobile hamburger toggle (simple)
+      const burger = document.getElementById('hamburger');
+      burger.addEventListener('click', ()=>{
+        burger.classList.toggle('open');
+        if(getComputedStyle(nav).display === 'none'){
+          nav.style.display = 'flex';
+          nav.style.flexDirection = 'column';
+          nav.style.padding = '12px';
+          nav.style.position = 'absolute';
+          nav.style.right = '18px';
+          nav.style.top = '72px';
+          nav.style.background = 'var(--glass)';
+          nav.style.backdropFilter = 'blur(8px)';
+        } else {
+          nav.removeAttribute('style');
+        }
+      });
+
+      // keep highlight positioned on resize
+      window.addEventListener('resize', ()=>{
+        const current = nav.querySelector('a.active') || links[0];
+        moveHighlightTo(current);
+      });
+    })();
+  </script>
+</body>
+</html>
